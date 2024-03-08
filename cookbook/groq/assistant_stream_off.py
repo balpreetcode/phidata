@@ -1,9 +1,23 @@
-from phi.assistant import Assistant
-from phi.llm.groq import Groq
+from groq import Groq
+import time
 
-assistant = Assistant(
-    llm=Groq(model="mixtral-8x7b-32768"),
-    description="You help people with their health and fitness goals.",
-    # debug_mode=True,
+client = Groq()
+completion = client.chat.completions.create(
+    model="mixtral-8x7b-32768",
+    messages=[
+        {
+            "role": "user",
+            "content": "respond in fastest time"
+        }
+    ],
+    temperature=0.5,
+    max_tokens=32768,
+    top_p=1,
+    stream=True,
+    stop=None,
 )
-assistant.print_response("Share a quick healthy breakfast recipe.", markdown=True, stream=False)
+start_time=time.time()
+for chunk in completion:
+    print(chunk.choices[0].delta.content or "", end="")
+
+print(f"\nElapsed time: {time.time() - start_time} seconds")
